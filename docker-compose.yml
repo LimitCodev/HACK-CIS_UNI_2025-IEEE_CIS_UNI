@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # 1. SERVICIO DE BASE DE DATOS (PostgreSQL)
   postgres_db:
     image: postgres:15-alpine
     container_name: postgres_db
@@ -20,7 +19,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # 2. SERVICIO DE CACHING (Redis)
   redis_cache:
     image: redis:7-alpine
     container_name: redis_cache
@@ -35,7 +33,6 @@ services:
       timeout: 3s
       retries: 5
 
-  # 3. SERVICIO DE ARQUITECTURA ML (ml-core) - Tu Módulo
   ml_core:
     build:
       context: ./ml-core
@@ -50,15 +47,13 @@ services:
       redis_cache:
         condition: service_healthy
     environment:
-      # Inyección de las variables LLM (Vienen del .env)
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       DEFAULT_LLM_MODEL: ${DEFAULT_LLM_MODEL}
     volumes:
       - ./ml-core:/app
-      - ./backend/app/uploads:/app/uploads # Permite acceder a los archivos subidos
+      - ./backend/app/uploads:/app/uploads
     
-  # 4. SERVICIO BACKEND/API GATEWAY - Módulo Orquestador
   backend_api:
     build:
       context: ./backend
@@ -72,16 +67,14 @@ services:
       - postgres_db
       - redis_cache
     environment:
-      # Conexiones CRÍTICAS, usan el nombre de los servicios Docker
       DATABASE_URL: postgresql://postgres:postgres123@postgres_db:5432/hackcis 
       REDIS_URL: redis://redis_cache:6379 
-      ML_CORE_URL: http://ml_core:8001 # El Backend llama a tu módulo ML aquí
+      ML_CORE_URL: http://ml_core:8001
       SECRET_KEY: ${SECRET_KEY}
     volumes:
       - ./backend:/app
-      - ./backend/app/uploads:/app/uploads # Carpeta donde se guardan los archivos
+      - ./backend/app/uploads:/app/uploads
       
-  # 5. SERVICIO FRONTEND (Asumiendo Next.js/React)
   frontend_app:
     build:
       context: ./frontend
