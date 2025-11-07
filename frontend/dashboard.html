@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNI Assistant AI</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <div class="logo">OTIC</div>
+                <h2>OTIC UNI Assistant AI</h2>
+            </div>
+            <div class="user-menu">
+                <span class="user-name" id="userName">Usuario</span>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1>¡Bienvenido de nuevo! 👋</h1>
+            <p>Sube tu material y comienza a resolver dudas con nuestra IA</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('pdf')">📄 Consultar PDF</button>
+            <button class="tab" onclick="switchTab('video')">🎥 Consultar Video</button>
+            <button class="tab" onclick="switchTab('history')">📚 Historial</button>
+        </div>
+
+
+        <div id="pdfTab" class="tab-content active">
+            
+            <div class="loading" id="pdfLoading">
+                <div class="spinner"></div>
+                <p>Procesando PDF...</p>
+            </div>
+
+            <div class="workspace-split-view" id="pdfMainView">
+                
+                <div class="content-panel" id="pdfLeftPanel">
+
+                    <div class="upload-section" id="pdfUploadSection">
+                        <h2>Sube tu PDF de OTIC UNI</h2>
+                        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📄</div>
+                            <h3>Arrastra tu PDF aquí</h3>
+                            <p>o haz click para seleccionar un archivo</p>
+                            <input type="file" id="fileInput" accept=".pdf">
+                        </div>
+                        <button class="action-btn" id="processPdfBtn" onclick="processPDF()" disabled>
+                            Cargar PDF
+                        </button>
+                    </div>
+
+                    <div class="viewer-panel" id="pdfViewerPanel" style="display: none;">
+                        <div class="viewer-header">
+                            <h3>📄 <span id="pdfFileNameViewer">Documento</span></h3>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" id="newPdfBtn" title="Subir otro PDF">Subir Otro Archivo</button>
+                            </div>
+                        </div>
+                        <div class="pdf-viewer" id="pdfViewer">
+                            <iframe id="pdfFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-panel" id="pdfChatPanel">
+                    <div class="chat-header">
+                        <h3>💬 Asistente IA</h3>
+                        <div class="chat-actions">
+                            <button class="quiz-toggle-btn" onclick="toggleQuiz('pdf')">📝 Quiz</button>
+                            <button class="clear-chat-btn" onclick="clearChat('pdf')">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="pdfChatMessages">
+                        <div class="ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>¡Hola! Sube un PDF y te ayudaré a resolver tus dudas sobre el contenido.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <input 
+                            type="text" 
+                            id="pdfChatInput" 
+                            class="chat-input"
+                            placeholder="Escribe tu pregunta..."
+                            onkeypress="handleEnter(event, 'pdf')"
+                            autocomplete="off" 
+                        >
+                        <button 
+                            class="send-btn" 
+                            onclick="sendMessage('pdf')"
+                        >
+                            <span>📤</span>
+                        </button>
+                    </div>
+                    <div class="chat-confirmation-overlay" id="pdfClearConfirm" style="display: none;">
+                        <div class="chat-confirmation-box">
+                            <p>¿Estás seguro de que quieres limpiar este chat?</p>
+                            <div class="chat-confirmation-buttons">
+                                <button class="btn-confirm-no" onclick="cancelClearChat('pdf')">Cancelar</button>
+                                <button class="btn-confirm-yes" onclick="confirmClearChat('pdf')">Sí, Limpiar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-confirmation-overlay" id="pdfQuizAlert" style="display: none;">
+                        <div class="chat-confirmation-box">
+                            <p id="pdfQuizAlertText">Mensaje de alerta</p>
+                            <div class="chat-confirmation-buttons">
+                                <button class="btn-confirm-yes" onclick="closeQuizAlert('pdf')">Entendido</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quiz-section" id="pdfQuizSection" style="display: none;">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="videoTab" class="tab-content">
+            
+            <div class="loading" id="videoLoading">
+                <div class="spinner"></div>
+                <p>Procesando video...</p>
+            </div>
+
+            <div class="workspace-split-view" id="videoMainView">
+
+                <div class="content-panel" id="videoLeftPanel">
+
+                    <div class="upload-section" id="videoUploadSection">
+                        <h2>Ingresa el video de YouTube</h2>
+                        <p style="color: #666; margin-bottom: 1rem;">Pega la URL del video de tu clase</p>
+                        <div class="url-input-group">
+                            <input 
+                            type="text" 
+                            id="videoUrl" 
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            autocomplete="off"
+                            >
+                            <button class="action-btn" onclick="processVideo()">Cargar Video</button>
+                        </div>
+                    </div>
+
+                    <div class="viewer-panel" id="videoViewerPanel" style="display: none;">
+                        <div class="viewer-header">
+                            <h3>🎥 <span id="videoTitleViewer">Video</span></h3>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" id="newVideoBtn" title="Cargar otro video">Cargar Otro</button>
+                            </div>
+                        </div>
+                        <div class="video-viewer" id="videoViewer">
+                            
+                            <iframe 
+                                id="videoFrame" 
+                                style="width: 100%; height: 100%; border: none; aspect-ratio: 16/9;" 
+                                src="" 
+                                title="Reproductor de video de YouTube" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-panel" id="videoChatPanel">
+                    <div class="chat-header">
+                        <h3>💬 Asistente IA</h3>
+                        <div class="chat-actions">
+                            <button class="quiz-toggle-btn" onclick="toggleQuiz('video')">📝 Quiz</button>
+                            <button class="clear-chat-btn" onclick="clearChat('video')">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages" id="videoChatMessages">
+                        <div class="ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>¡Hola! Ingresa un video de YouTube y te ayudaré a entender el contenido.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <input 
+                            type="text" 
+                            id="videoChatInput" 
+                            class="chat-input"
+                            placeholder="Escribe tu pregunta..."
+                            onkeypress="handleEnter(event, 'video')"
+                            autocomplete="off" 
+                        >
+                        <button 
+                            class="send-btn" 
+                            onclick="sendMessage('video')"
+                        >
+                            <span>📤</span>
+                        </button>
+                    </div>
+                    <div class="chat-confirmation-overlay" id="videoClearConfirm" style="display: none;">
+                        <div class="chat-confirmation-box">
+                            <p>¿Estás seguro de que quieres limpiar este chat?</p>
+                            <div class="chat-confirmation-buttons">
+                                <button class="btn-confirm-no" onclick="cancelClearChat('video')">Cancelar</button>
+                                <button class="btn-confirm-yes" onclick="confirmClearChat('video')">Sí, Limpiar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-confirmation-overlay" id="videoQuizAlert" style="display: none;">
+                        <div class="chat-confirmation-box">
+                            <p id="videoQuizAlertText">Mensaje de alerta</p>
+                            <div class="chat-confirmation-buttons">
+                                <button class="btn-confirm-yes" onclick="closeQuizAlert('video')">Entendido</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quiz-section" id="videoQuizSection" style="display: none;">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="historyTab" class="tab-content">
+            </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
