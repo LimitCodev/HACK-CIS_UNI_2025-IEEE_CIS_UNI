@@ -1,0 +1,15 @@
+# ML Frameworks y Clientes de API (Innovación 25%)
+openai==1.3.7
+anthropic==0.7.8
+tiktoken==0.5.2
+# ^ Usar tiktoken para el conteo preciso de tokens
+
+# Procesamiento de I/O y Datos
+PyPDF2==3.0.1
+pdfplumber==0.10.3
+yt-dlp==2023.11.16
+youtube-transcript-api==0.6.1
+
+# Utilidades
+pydantic==2.5.0
+python-dotenv==1.0.0

@@ -1,0 +1,1 @@
+from .v1.analyze_routes import router as analyze_router

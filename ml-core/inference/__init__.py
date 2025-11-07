@@ -1,0 +1,2 @@
+from .embeddings_generator import EmbeddingsGenerator
+from .specific_inference import SpecificInference
